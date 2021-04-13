@@ -1,0 +1,112 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+<title>WFLCMPST</title> 
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<style type="text/css"> 
+	body {
+		background-color: #000
+	}
+	#console {
+		font-family: courier, monospace;
+		color: #fff;
+		width:750px;
+		margin-left:auto;
+		margin-right:auto;
+		margin-top:40px;
+		font-size:14px;
+	}
+	p {
+		margin: 0 0 10px 0;
+	}
+	a {
+		color: #0bc;
+		text-decoration: none;
+	}
+	#a {
+		color: #0f0;
+	}
+	#c {
+		color: #0bc;
+	}
+	#b {
+		color: #ff0096;
+	}
+</style> 
+</head> 
+<body> 
+<script type="text/javascript"> 
+var Typer={
+	text: null,
+	countTimer:null,
+	index:0, // current cursor position
+	speed:7, // speed of the Typer
+	init: function(){// inizialize Typer
+		countTimer=setInterval(function(){Typer.updLstChr();},500); // inizialize timer for blinking cursor
+		Typer.text = Typer.text.slice(0, Typer.text.length-1);
+	},
+ 
+	content:function(){
+		return $("#console").html();// get console content
+	},
+ 
+	write:function(str){// append to console content
+		$("#console").append(str);
+		return false;
+	},
+ 
+	addText:function(){//Main function to add the code
+		if(Typer.text){ // if text is loaded
+			var cont=Typer.content(); // get the console content
+			if(cont.substring(cont.length-1,cont.length)=="|") // if the last char is the blinking cursor
+				$("#console").html($("#console").html().substring(0,cont.length-1)); // remove it before adding the text
+
+			Typer.index+=Typer.speed;	// add to the index the speed
+			var text=Typer.text.substring(0,Typer.index)// parse the text for stripping html enities
+			var rtn= new RegExp("\n", "g"); // newline regex
+			$("#console").html(text.replace(rtn,"<br/>"));// replace newline chars with br, tabs with 4 space and blanks with an html blank
+			window.scrollBy(0,50); // scroll to make sure bottom is always visible
+		}
+
+	},
+ 
+	updLstChr:function(){ // blinking cursor
+		var cont=this.content(); // get console 
+		if(cont.substring(cont.length-1,cont.length)=="|") // if last char is the cursor
+			$("#console").html($("#console").html().substring(0,cont.length-1)); // remove it
+		else
+			this.write("|"); // else write it
+	}
+}
+
+var timer;
+function t() {
+	Typer.addText();
+	if (Typer.index > Typer.text.length) {
+		clearInterval(timer);
+	}
+}
+	
+$(function() {
+	Typer.text=$("#yesThisIsAnActualText").html();
+	Typer.init();
+	timer = setInterval("t();", 30);
+});
+
+
+</script> 
+<div id="console"></div> 
+
+<div id="yesThisIsAnActualText" style="display: none;">
+<p>wafflecomposite@github.io: ~$ cat readme.htm&nbsp;</p>
+<p><a href="rdr_compendium/">Red Dead Redemption 2 leaked Compendium</a><span style="color: #00ff00;"> (and <a href="rdr_compendium_ru/">Russian version</a>). Datamined before game release.</span></p>
+<p><span style="color: #00ff00;"><a href="YAYVIDEOGAMES/">YAYVIDEOGAMES comment history</a>. Investigation <a href="https://www.reddit.com/r/YayVideoGames/">subreddit</a></span></p>
+<!-- <p>&nbsp;</p> -->
+<span>wafflecomposite@github.io: ~$ logout</span>
+<span>Session closed.</span>
+</div> 
+</body></html>
+<!-- It was quite hard to track, but seems that https://www.jeffweisbein.com/ is original creator to give some credits. Slightly cleaned and singlepaged by me. 2018 -->
