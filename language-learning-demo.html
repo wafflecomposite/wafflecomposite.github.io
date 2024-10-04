@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Language Learning Revisions</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+  /* Tab styles */
+  .tab-container {
+    display: flex;
+    flex-direction: column;
+  }
+  .tab-buttons {
+    display: flex;
+    overflow: auto;
+    background-color: #333;
+  }
+  .tab-buttons button {
+    flex: 1;
+    padding: 14px 16px;
+    color: white;
+    background-color: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s;
+    font-size: 17px;
+  }
+  .tab-buttons button:hover {
+    background-color: #575757;
+  }
+  .tab-buttons button.active {
+    background-color: #575757;
+  }
+  .tab-content {
+    padding: 20px;
+    display: none;
+    background-color: white;
+  }
+  .tab-content.active {
+    display: block;
+  }
+  /* Sentence styles */
+  .sentence {
+    margin-bottom: 15px;
+    cursor: pointer;
+    position: relative;
+  }
+  .sentence::after {
+    content: '➔';
+    position: absolute;
+    right: 0;
+    color: #888;
+  }
+  /* Modal styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    padding-top: 60px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+  }
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    max-width: 90%;
+    border-radius: 5px;
+  }
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: -10px;
+  }
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  /* Responsive adjustments */
+  @media screen and (max-width: 600px) {
+    .tab-buttons button {
+      font-size: 14px;
+      padding: 10px;
+    }
+    .modal-content {
+      padding: 15px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="tab-container">
+  <div class="tab-buttons">
+    <button class="tab-link active" onclick="openTab(event, 'controlled')">Controlled Revision</button>
+    <button class="tab-link" onclick="openTab(event, 'formal')">Formal Revision</button>
+    <button class="tab-link" onclick="openTab(event, 'informal')">Informal Revision</button>
+  </div>
+
+  <div id="controlled" class="tab-content active">
+    <div id="controlled-content"></div>
+  </div>
+
+  <div id="formal" class="tab-content">
+    <p id="formal-text"></p>
+    <h3>Notes:</h3>
+    <p id="formal-notes"></p>
+  </div>
+
+  <div id="informal" class="tab-content">
+    <p id="informal-text"></p>
+    <h3>Notes:</h3>
+    <p id="informal-notes"></p>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h3>Changes and Explanations</h3>
+    <ul id="modal-content"></ul>
+  </div>
+</div>
+
+<script>
+// Hardcoded JSON data
+const data = {
+  "controlled_revision": {
+    "text": "Yesterday, I went to the market and found some fruits that were cheap, so I bought a lot because they had good prices. But when I went out, my bag broke, and the apples fell on the floor. People looked at me very angrily and told me to clean it up, but there was no dustpan anywhere, and I didn't know what to do. Then a man came and said he would help me, but he picked up some apples and ran away. I was shocked and couldn't do anything; I just stood there. I felt very sad, so I took a rest and walked home slowly.",
+    "sentences": [
+      {
+        "text": "Yesterday, I went to the market and found some fruits that were cheap, so I bought a lot because they had good prices.",
+        "changes": [
+          {
+            "original": "yestday I goes",
+            "corrected": "Yesterday, I went",
+            "explanation": "\"Yestday\" is corrected to \"Yesterday,\" and \"goes\" is changed to \"went\" to use the correct past tense."
+          },
+          {
+            "original": "to the mervos market",
+            "corrected": "to the market",
+            "explanation": "\"Mervos\" is likely a typo or misunderstanding; \"market\" is sufficient unless a specific name is intended."
+          },
+          {
+            "original": "there finded some fruites",
+            "corrected": "found some fruits",
+            "explanation": "\"Finded\" is incorrect; the correct past tense of \"find\" is \"found.\" Also, \"fruites\" is corrected to \"fruits.\""
+          },
+          {
+            "original": "was cheap and buyed lot",
+            "corrected": "that were cheap, so I bought a lot",
+            "explanation": "\"Was\" is changed to \"that were\" for correct relative clause structure, and \"buyed\" is corrected to \"bought.\""
+          },
+          {
+            "original": "becuz it good prices",
+            "corrected": "because they had good prices",
+            "explanation": "\"Becuz\" is corrected to \"because,\" and \"it\" is changed to \"they\" to agree with \"fruits.\""
+          }
+        ]
+      },
+      {
+        "text": "But when I went out, my bag broke, and the apples fell on the floor.",
+        "changes": [
+          {
+            "original": "wen i go out",
+            "corrected": "But when I went out",
+            "explanation": "\"Wen\" is corrected to \"when,\" and \"go\" is changed to \"went\" for past tense."
+          },
+          {
+            "original": "bag broken apple's falleds",
+            "corrected": "my bag broke, and the apples fell",
+            "explanation": "\"Bag broken\" is changed to \"my bag broke,\" and \"apple's falleds\" is corrected to \"the apples fell.\""
+          },
+          {
+            "original": "on flour",
+            "corrected": "on the floor",
+            "explanation": "\"Flour\" is corrected to \"floor.\""
+          }
+        ]
+      },
+      {
+        "text": "People looked at me very angrily and told me to clean it up, but there was no dustpan anywhere, and I didn't know what to do.",
+        "changes": [
+          {
+            "original": "peoples look me very angrily",
+            "corrected": "People looked at me very angrily",
+            "explanation": "\"Peoples\" is corrected to \"People,\" and \"look me\" is changed to \"looked at me.\""
+          },
+          {
+            "original": "telled me to clean",
+            "corrected": "told me to clean it up",
+            "explanation": "\"Telled\" is corrected to \"told,\" and \"clean\" is expanded to \"clean it up\" for clarity."
+          },
+          {
+            "original": "were no dustpna anywhere",
+            "corrected": "there was no dustpan anywhere",
+            "explanation": "\"Were\" is corrected to \"there was,\" and \"dustpna\" is corrected to \"dustpan.\""
+          },
+          {
+            "original": "I doesn't know what todoing",
+            "corrected": "and I didn't know what to do",
+            "explanation": "\"Doesn't\" is corrected to \"didn't,\" and \"todoing\" is corrected to \"to do.\""
+          }
+        ]
+      },
+      {
+        "text": "Then a man came and said he would help me, but he picked up some apples and ran away.",
+        "changes": [
+          {
+            "original": "then man come and saied help you",
+            "corrected": "Then a man came and said he would help me",
+            "explanation": "\"Man\" is changed to \"a man,\" \"come\" is corrected to \"came,\" and \"saied\" is corrected to \"said.\""
+          },
+          {
+            "original": "but he pick some appes and runned away",
+            "corrected": "but he picked up some apples and ran away",
+            "explanation": "\"Pick\" is corrected to \"picked up,\" and \"runned\" is corrected to \"ran.\""
+          }
+        ]
+      },
+      {
+        "text": "I was shocked and couldn't do anything; I just stood there.",
+        "changes": [
+          {
+            "original": "i was shoked couldnt nothing did",
+            "corrected": "I was shocked and couldn't do anything",
+            "explanation": "\"Shoked\" is corrected to \"shocked,\" and \"couldnt nothing did\" is corrected to \"couldn't do anything.\""
+          },
+          {
+            "original": "i just standed there",
+            "corrected": "I just stood there",
+            "explanation": "\"Standed\" is corrected to \"stood.\""
+          }
+        ]
+      },
+      {
+        "text": "I felt very sad, so I took a rest and walked home slowly.",
+        "changes": [
+          {
+            "original": "i feeled very sad",
+            "corrected": "I felt very sad",
+            "explanation": "\"Feeled\" is corrected to \"felt.\""
+          },
+          {
+            "original": "so taked rest and walk slow home",
+            "corrected": "so I took a rest and walked home slowly",
+            "explanation": "\"Taked\" is corrected to \"took,\" and \"walk slow\" is corrected to \"walked home slowly.\""
+          }
+        ]
+      }
+    ]
+  },
+  "formal_revision": {
+    "text": "Yesterday, I visited the market and discovered some fruits that were quite affordable, so I purchased a considerable amount due to their favorable prices. However, upon exiting the market, my bag tore, causing the apples to spill onto the floor. The onlookers glared at me angrily and instructed me to clean up the mess, but there was no dustpan in sight, and I was at a loss for what to do. Subsequently, a man approached and offered his assistance, but he proceeded to pick up some apples and fled. I was utterly shocked and found myself unable to react; I simply stood there. Feeling deeply disheartened, I took a moment to rest before making my way home at a slow pace.",
+    "notes": "Used more formal vocabulary like 'visited the market', 'discovered some fruits', 'quite affordable', 'purchased a considerable amount', 'upon exiting the market', 'causing the apples to spill', 'the onlookers glared at me angrily', 'instructed me to clean up the mess', 'at a loss for what to do', 'subsequently, a man approached', 'offered his assistance', 'utterly shocked', 'found myself unable to react', 'feeling deeply disheartened', and 'making my way home at a slow pace' to elevate the tone."
+  },
+  "informal_revision": {
+    "text": "Yesterday, I went to the market and found some cheap fruits, so I bought a bunch because the prices were great. But when I left, my bag broke, and the apples fell all over the floor. People gave me angry looks and told me to clean it up, but there was no dustpan anywhere, and I had no idea what to do. Then this guy came over and said he'd help, but he grabbed some apples and ran off. I was so shocked, I just froze. I felt really sad, so I took a break and walked home slowly.",
+    "notes": "Used casual language like 'went to the market', 'found some cheap fruits', 'bought a bunch', 'when I left', 'my bag broke', 'people gave me angry looks', 'told me to clean it up', 'no idea what to do', 'this guy came over', 'said he'd help', 'grabbed some apples and ran off', 'I was so shocked, I just froze', 'felt really sad', and 'took a break and walked home slowly' to make the text more conversational."
+  }
+};
+
+// Function to open tabs
+function openTab(evt, tabName) {
+  const tablinks = document.getElementsByClassName('tab-link');
+  const tabcontents = document.getElementsByClassName('tab-content');
+
+  // Hide all tab contents
+  for (let i = 0; i < tabcontents.length; i++) {
+    tabcontents[i].classList.remove('active');
+  }
+
+  // Remove active class from all buttons
+  for (let i = 0; i < tablinks.length; i++) {
+    tablinks[i].classList.remove('active');
+  }
+
+  // Show the current tab and add active class to the button
+  document.getElementById(tabName).classList.add('active');
+  evt.currentTarget.classList.add('active');
+}
+
+// Function to populate Controlled Revision tab
+function populateControlledRevision() {
+  const container = document.getElementById('controlled-content');
+  const sentences = data.controlled_revision.sentences;
+
+  sentences.forEach((sentence, index) => {
+    const sentenceDiv = document.createElement('div');
+    sentenceDiv.className = 'sentence';
+    sentenceDiv.textContent = sentence.text;
+    sentenceDiv.onclick = () => openModal(index);
+    container.appendChild(sentenceDiv);
+  });
+}
+
+// Function to open modal with changes
+function openModal(sentenceIndex) {
+  const modal = document.getElementById('modal');
+  const modalContent = document.getElementById('modal-content');
+  modalContent.innerHTML = '';
+
+  const changes = data.controlled_revision.sentences[sentenceIndex].changes;
+
+  changes.forEach(change => {
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `<strong>Original:</strong> ${change.original}<br>
+                          <strong>Corrected:</strong> ${change.corrected}<br>
+                          <strong>Explanation:</strong> ${change.explanation}`;
+    modalContent.appendChild(listItem);
+  });
+
+  modal.style.display = 'block';
+}
+
+// Function to close modal
+function closeModal() {
+  const modal = document.getElementById('modal');
+  modal.style.display = 'none';
+}
+
+// Populate Formal and Informal Revisions
+function populateRevisions() {
+  // Formal Revision
+  document.getElementById('formal-text').textContent = data.formal_revision.text;
+  document.getElementById('formal-notes').textContent = data.formal_revision.notes;
+
+  // Informal Revision
+  document.getElementById('informal-text').textContent = data.informal_revision.text;
+  document.getElementById('informal-notes').textContent = data.informal_revision.notes;
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+  const modal = document.getElementById('modal');
+  if (event.target == modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Initialize the app
+function init() {
+  populateControlledRevision();
+  populateRevisions();
+}
+
+init();
+</script>
+
+</body>
+</html>
